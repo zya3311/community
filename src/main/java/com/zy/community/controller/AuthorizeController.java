@@ -2,9 +2,9 @@ package com.zy.community.controller;
 
 import com.zy.community.dto.AccessTokenDTO;
 import com.zy.community.dto.GithubUser;
-import com.zy.community.mapper.UserMapper;
 import com.zy.community.model.User;
 import com.zy.community.provider.GithubProvider;
+import com.zy.community.service.UserServcie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class AuthorizeController {
     private String redirectUri;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserServcie userServcie;
 
     @GetMapping("/callback")
     public String callback(@RequestParam("code") String code,
@@ -61,13 +62,22 @@ public class AuthorizeController {
             user.setGmtModified(user.getGmtCreate());
             user.setBio(githubUser.getBio());
             user.setAvatarUrl(githubUser.getAvatarUrl());
-            userMapper.insert(user);
+            int result = userServcie.createOrUpdate(user);
             response.addCookie(new Cookie("token", token));
             // 登录成功，写入cookie和session
         } else {
             // 登录失败，重新登录
             log.error("callback get github error,{}", githubUser);
         }
+        return "redirect:/";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        request.getSession().removeAttribute("user");
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
         return "redirect:/";
     }
 }
