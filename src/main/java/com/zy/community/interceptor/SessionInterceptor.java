@@ -1,6 +1,7 @@
 package com.zy.community.interceptor;
 import com.zy.community.mapper.UserMapper;
 import com.zy.community.model.User;
+import com.zy.community.model.UserExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -33,9 +35,11 @@ public class SessionInterceptor implements HandlerInterceptor {
             for(Cookie cookie :cookies) {
                 if(Objects.equals(cookie.getName(), "token")) {
                     String token = cookie.getValue();
-                    User user = userMapper.findByToken(token);
-                    if(user != null) {
-                        request.getSession().setAttribute("user", user);
+                    UserExample userExample = new UserExample();
+                    userExample.createCriteria().andTokenEqualTo(token);
+                    List<User> users = userMapper.selectByExample(userExample);
+                    if(users != null && users.size() != 0) {
+                        request.getSession().setAttribute("user", users.get(0));
                     }
                     break;
                 }
