@@ -4,6 +4,7 @@ import com.zy.community.dto.PaginationDTO;
 import com.zy.community.dto.QuestionDTO;
 import com.zy.community.exception.CustomizeErrorCode;
 import com.zy.community.exception.CustomizeException;
+import com.zy.community.mapper.QuestionExtMapper;
 import com.zy.community.mapper.QuestionMapper;
 import com.zy.community.mapper.UserMapper;
 import com.zy.community.model.Question;
@@ -28,6 +29,9 @@ public class QuestionService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
 
     /**
      * 分页查询问题
@@ -132,6 +136,13 @@ public class QuestionService {
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
         }
+    }
+
+    public void incView(Long id) {
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
     }
 }
 
