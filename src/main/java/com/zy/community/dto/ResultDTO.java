@@ -1,7 +1,7 @@
-package life.majiang.community.dto;
+package com.zy.community.dto;
 
-import life.majiang.community.exception.CustomizeErrorCode;
-import life.majiang.community.exception.CustomizeException;
+import com.zy.community.exception.CustomizeErrorCode;
+import com.zy.community.exception.CustomizeException;
 import lombok.Data;
 
 /**

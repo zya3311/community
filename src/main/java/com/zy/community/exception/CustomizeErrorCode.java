@@ -1,4 +1,4 @@
-package life.majiang.community.exception;
+package com.zy.community.exception;
 
 /**
  * Created by codedrinker on 2019/5/28.

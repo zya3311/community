@@ -2,6 +2,8 @@ package com.zy.community.service;
 
 import com.zy.community.dto.PaginationDTO;
 import com.zy.community.dto.QuestionDTO;
+import com.zy.community.exception.CustomizeErrorCode;
+import com.zy.community.exception.CustomizeException;
 import com.zy.community.mapper.QuestionMapper;
 import com.zy.community.mapper.UserMapper;
 import com.zy.community.model.Question;
@@ -112,6 +114,9 @@ public class QuestionService {
 
     public QuestionDTO getById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
+        if(null == question) {
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
@@ -123,7 +128,9 @@ public class QuestionService {
         if(question.getId() == null) {
             questionMapper.insert(question);
         } else {
-            questionMapper.updateByPrimaryKey(question);
+            if(questionMapper.updateByPrimaryKey(question) != 1) {
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }
     }
 }
