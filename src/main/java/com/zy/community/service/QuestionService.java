@@ -5,7 +5,9 @@ import com.zy.community.dto.QuestionDTO;
 import com.zy.community.mapper.QuestionMapper;
 import com.zy.community.mapper.UserMapper;
 import com.zy.community.model.Question;
+import com.zy.community.model.QuestionExample;
 import com.zy.community.model.User;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class QuestionService {
 
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;
-        Integer totalCount = questionMapper.count();
+        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
 
         if(totalCount % size == 0) {
             totalPage = totalCount / size;
@@ -52,7 +54,8 @@ public class QuestionService {
         paginationDTO.setPagination(totalPage, page);
 
         Integer offset = size * (page - 1);
-        List<Question> questions = questionMapper.list(offset, size);
+        List<Question> questions =
+                questionMapper.selectByExampleWithRowbounds(new QuestionExample(), new RowBounds(offset, size));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
 
         for(Question question : questions) {
@@ -70,7 +73,9 @@ public class QuestionService {
     public PaginationDTO list(Long id, Integer page, Integer size) {
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;
-        Integer totalCount = questionMapper.countByUserId(id);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria().andCreatorEqualTo(id);
+        Integer totalCount = (int) questionMapper.countByExample(questionExample);
 
         if(totalCount % size == 0) {
             totalPage = totalCount / size;
@@ -87,7 +92,10 @@ public class QuestionService {
 
 
         Integer offset = size * (page - 1);
-        List<Question> questions = questionMapper.listByUserId(id, offset, size);
+        QuestionExample example = new QuestionExample();
+        example.createCriteria().andCreatorEqualTo(id);
+        List<Question> questions =
+                questionMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
 
         for(Question question : questions) {
@@ -103,7 +111,7 @@ public class QuestionService {
     }
 
     public QuestionDTO getById(Long id) {
-        Question question = questionMapper.getById(id);
+        Question question = questionMapper.selectByPrimaryKey(id);
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
@@ -113,9 +121,9 @@ public class QuestionService {
 
     public void createOrUpdate(Question question) {
         if(question.getId() == null) {
-            questionMapper.create(question);
+            questionMapper.insert(question);
         } else {
-            questionMapper.update(question);
+            questionMapper.updateByPrimaryKey(question);
         }
     }
 }

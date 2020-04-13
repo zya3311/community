@@ -63,7 +63,7 @@ public class PublishController {
         }
 
         Question question = new Question();
-        question.setTag(title);
+        question.setTag(tag);
         question.setTitle(title);
         question.setDescription(description);
         question.setCreator(user.getId());
