@@ -130,6 +130,9 @@ public class QuestionService {
 
     public void createOrUpdate(Question question) {
         if(question.getId() == null) {
+            question.setViewCount(0);
+            question.setLikeCount(0);
+            question.setCommentCount(0);
             questionMapper.insert(question);
         } else {
             if(questionMapper.updateByPrimaryKey(question) != 1) {
