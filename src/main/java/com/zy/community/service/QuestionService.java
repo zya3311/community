@@ -118,6 +118,9 @@ public class QuestionService {
 
     public QuestionDTO getById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
+        if(question.getCommentCount() == null) {
+            question.setCommentCount(0);
+        }
         if(null == question) {
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         }

@@ -1,8 +1,10 @@
 package com.zy.community.enums;
 
 public enum CommentTypeEnum {
+
     QUESTION(1),
     COMMENT(2);
+
     private Integer type;
 
 
