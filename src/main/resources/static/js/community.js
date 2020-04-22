@@ -28,8 +28,7 @@ function comment2target(targetId, type, content) {
         }),
         success: function (response) {
             if (response.code == 200) {
-                // window.location.reload();
-                $("#comment_section").hide();
+                window.location.reload();
             } else {
                 if (response.code == 2003) {
                     var isAccepted = confirm(response.message);
